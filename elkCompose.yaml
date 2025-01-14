@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: elasticsearch:7.16.1
+    image: elasticsearch:8.17.0
     container_name: es
     environment:
       discovery.type: single-node
@@ -16,7 +16,7 @@ services:
     networks:
       - elastic
   logstash:
-    image: logstash:7.16.1
+    image: logstash:8.17.0
     container_name: log
     environment:
       discovery.seed_hosts: logstash
@@ -25,8 +25,9 @@ services:
       - ./logstash/pipeline/logstash-nginx.config:/usr/share/logstash/pipeline/logstash-nginx.config
       - ./logstash/nginx.log:/home/nginx.log
     ports:
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
+      # changed from 5000 on localhost because another system app was using 5000 port on lsof -i -P port
+      - "5001:5000/tcp"
+      - "5001:5000/udp"
       - "5044:5044"
       - "9600:9600"
     depends_on:
@@ -35,7 +36,7 @@ services:
       - elastic
     command: logstash -f /usr/share/logstash/pipeline/logstash-nginx.config
   kibana:
-    image: kibana:7.16.1
+    image: kibana:8.17.0
     container_name: kib
     ports:
       - "5601:5601"
